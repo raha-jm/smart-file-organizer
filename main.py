@@ -47,7 +47,12 @@ def move_file(file_info):
         destination_folder = parent_folder/folder_name
         create_folder(destination_folder)
         destination_path = destination_folder/file_path.name
-        shutil.move(file_path,destination_path)
+        try: 
+            shutil.move(file_path,destination_path)
+        except Exception as e :
+            print("Could not move file:")
+            print(file_path.name)
+            print(f"Reason: {e}")
 
 
         
