@@ -1,6 +1,6 @@
 import pathlib 
 import shutil
-
+import csv
 
 def get_folder_path():
     while True:
@@ -20,7 +20,7 @@ def get_folder_path():
 def get_files(folder_path):
     files = []
     for file in folder_path.iterdir():
-        if file.isfile():
+        if file.is_file():
             files.append(file)
     return files
 
@@ -36,7 +36,7 @@ def get_file_type(files):
     }
     for file in files:
         suff = file.suffix.lower()
-        suffix_folder = extension_map.get(suff,"Others")
+        suffix_folder = extension_map.get(suff,"Other")
         file_type[file] = suffix_folder
     return file_type
 
@@ -54,6 +54,35 @@ def move_file(file_info):
 def create_folder(destination_folder):
      destination_folder.mkdir(parents = True , exist_ok = True)
 
-def create_report():
-    pass
-get_folder_path()
+def create_report(file_info):
+    report ={}
+    for folder_name in file_info.values():
+       count = report.get(folder_name,0)
+       count +=1
+       report[folder_name]=count 
+    return report
+
+
+def save_report(report,output_path):
+    with open(output_path,
+          "w",
+          newline="",
+          encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Category","Count"])
+        for category,count in report.items():
+            writer.writerow([category,count])
+
+    
+def main():
+    folder_path = get_folder_path()
+    files = get_files(folder_path)
+    file_info =get_file_type(files)
+    move_file(file_info)
+    report = create_report(file_info)
+    output_path = folder_path / "report.csv"
+    save_report(report, output_path)
+
+
+if __name__ == "__main__":
+    main()
