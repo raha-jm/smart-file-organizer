@@ -52,10 +52,29 @@ def get_all_files(folder_path):
             files.append(file)
     return files
 
+
+def create_default_config(config_path):
+    default_config = {
+    ".jpg": "Images",
+    ".jpeg": "Images",
+    ".png": "Images",
+    ".pdf": "Documents",
+    ".mp4": "Videos",
+    ".mp3": "Music",
+    ".zip": "Archives"
+    }
+    with open(config_path,"w") as file:   
+        json.dump(default_config,file,indent=4)  
+
+
 def load_config(config_path):
+    if not config_path.exists():
+        create_default_config(config_path)
     with open(config_path,"r") as file:
         config = json.load(file)
     return config
+    
+
     
 def get_file_type(files,config):
     file_type  = {}
@@ -106,7 +125,8 @@ def save_report(report,output_path):
 def main():
     folder_path = get_folder_path()
     mode = get_search_mode()
-    config = load_config("config.json")
+    config_path = pathlib.Path("config.json")
+    config = load_config(config_path)
     if mode :   
         files = get_all_files(folder_path)
     else:
