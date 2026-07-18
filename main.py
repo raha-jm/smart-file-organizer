@@ -4,11 +4,10 @@ import csv
 import logging
 
 logging.basicConfig(
-    filename= "organizer.log",
+    filename="organizer.log",
     level=logging.INFO,
-    format="%(levelname)s %(message)s"
+    force="%(levelname)s %(message)s"
 )
-
 
 def get_folder_path():
     while True:
@@ -80,7 +79,7 @@ def move_file(file_info):
             shutil.move(file_path,destination_path)
             logging.info(f"Moved {file_path.name}")
         except Exception as e :
-            logging.error(f"Failed to move {file_path.name} : {e}")
+            logging.info(f"Failed to move {file_path.name} : {e}")
 
 
         
