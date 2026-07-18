@@ -1,6 +1,14 @@
 import pathlib 
 import shutil
 import csv
+import logging
+
+logging.basicConfig(
+    filename= "organizer.log",
+    level=logging.INFO,
+    format="%(levelname)s %(message)s"
+)
+
 
 def get_folder_path():
     while True:
@@ -16,6 +24,18 @@ def get_folder_path():
             print("The path does not exist")
             continue
 
+def get_search_mode():
+    while True:
+        print('''Search mode :
+              1.Current folder only
+              2.Current folder + subfolder''')
+        mode = input("Chose(1/2):")
+        if mode == '1':
+            return False
+        elif mode == '2':
+            return True
+        else :
+            print("Invalid choice...")
 
 def get_files(folder_path):
     files = []
@@ -23,6 +43,15 @@ def get_files(folder_path):
         if file.is_file():
             files.append(file)
     return files
+
+
+def get_all_files(folder_path):
+    files = []
+    for file in folder_path.rglob("*"):
+        if file.is_file():
+            files.append(file)
+    return files
+
 
 def get_file_type(files):
     file_type  = {}
@@ -49,10 +78,9 @@ def move_file(file_info):
         destination_path = destination_folder/file_path.name
         try: 
             shutil.move(file_path,destination_path)
+            logging.info(f"Moved {file_path.name}")
         except Exception as e :
-            print("Could not move file:")
-            print(file_path.name)
-            print(f"Reason: {e}")
+            logging.error(f"Failed to move {file_path.name} : {e}")
 
 
         
@@ -81,7 +109,11 @@ def save_report(report,output_path):
     
 def main():
     folder_path = get_folder_path()
-    files = get_files(folder_path)
+    mode = get_search_mode()
+    if mode :   
+        files = get_all_files(folder_path)
+    else:
+        files = get_files(folder_path)
     file_info =get_file_type(files)
     move_file(file_info)
     report = create_report(file_info)
