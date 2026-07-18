@@ -2,6 +2,7 @@ import pathlib
 import shutil
 import csv
 import logging
+import json
 
 logging.basicConfig(
     filename="organizer.log",
@@ -51,20 +52,16 @@ def get_all_files(folder_path):
             files.append(file)
     return files
 
-
-def get_file_type(files):
+def load_config(config_path):
+    with open(config_path,"r") as file:
+        config = json.load(file)
+    return config
+    
+def get_file_type(files,config):
     file_type  = {}
-    extension_map = {
-    ".jpg": "Images",
-    ".jpeg": "Images",
-    ".png": "Images",
-    ".pdf": "Documents",
-    ".mp4": "Videos",
-    ".mp3": "Music"
-    }
     for file in files:
         suff = file.suffix.lower()
-        suffix_folder = extension_map.get(suff,"Other")
+        suffix_folder = config.get(suff,"Other")
         file_type[file] = suffix_folder
     return file_type
 
@@ -109,11 +106,12 @@ def save_report(report,output_path):
 def main():
     folder_path = get_folder_path()
     mode = get_search_mode()
+    config = load_config("config.json")
     if mode :   
         files = get_all_files(folder_path)
     else:
         files = get_files(folder_path)
-    file_info =get_file_type(files)
+    file_info =get_file_type(files,config)
     move_file(file_info)
     report = create_report(file_info)
     output_path = folder_path / "report.csv"
